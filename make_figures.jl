@@ -4,21 +4,187 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    #! format: off
+    quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+    #! format: on
+end
+
 # ╔═╡ 7f830ff0-b7a4-11ef-12d3-af29c0deae66
-using Plots, PlutoUI, Latexify
+using Plots, PlutoUI, LaTeXStrings, LinearAlgebra
 
 # ╔═╡ ba18a25b-9440-477e-b25c-cf1a7714a6d5
+begin
+	xlims = (-1,1)
+	ylims = (-1,1)
+	offset = 0.8
+	slope = 0.5
+	liney = [-slope,slope]
+	H = [-offset,-offset*slope]
+	P = [0.1,0.7]
+	Hu = H .+ 0.5*[1, slope]
+	u = [1,slope]/sqrt(1+slope^2)
+	dH = dot((P-H),u)*u
+	H2 = H + dH
+	dd = atan(u[2]/u[1]):pi/200:atan((P[2]-H[2])/(P[1]-H[1]))
+	arc = [H[1] .+ 0.5*cos.(dd), H[2] .+ 0.5*sin.(dd)]
+end;
 
+# ╔═╡ 05360d6e-4a6e-494a-ad39-64d4293b7dcd
+begin
+	plt1b = plot(xlabel="",ylabel="",border=:none,xlims=xlims,ylims=ylims,legend=false)
+	plot!(plt1b,[-1,1],liney,lc=1)
+	plot!(plt1b,[H[1],P[1]],[H[2],P[2]],color=:black,lw=3,arrow=true,markers=true)
+	plot!(plt1b,[H[1],H2[1]],[H[2],H2[2]],color=:brown,lw=3,arrow=true)
+	plot!(plt1b,[H[1],Hu[1]],[H[2],Hu[2]],color=:red,lw=3,arrow=true)
+	plot!(plt1b,[P[1],H2[1]],[P[2],H2[2]],color=:brown,ls=:dash)
+	plot!(plt1b,arc[1],arc[2],lw=3,color=:brown)
+	plot!(plt1b,[H[1],P[1]],[H[2],P[2]],color=:black,lw=3,arrow=true,markers=true,ms=6)
+	annotate!(plt1b,H[1],H[2]+0.15,text(L"\mathbf{\bar{H}}", :black, :18))
+	annotate!(plt1b,P[1],P[2]+0.1,text(L"\mathbf{\bar{P}}", :black, :18))
+	annotate!(plt1b,0.5*(H[1]+P[1]),0.5*(H[2]+P[2])+0.2,text(L"\mathbf{\bar{D}}", :black, :18))
+	annotate!(plt1b,0.5*(H[1]+Hu[1]),0.5*(H[2]+Hu[2])-0.1,text(L"\mathbf{\hat{u}}", :red, :18))
+	annotate!(plt1b,0.3*(H[1]+H2[1]),0.3*(H[2]+H2[2])-0.1,text(L"\mathbf{d\bar{H}}", :brown, :18))
+	annotate!(plt1b,0.7*(H[1]+H2[1]),0.7*(H[2]+H2[2])+0.15,text(L"\theta", :brown, :18))
+	annotate!(plt1b,-1, 1, text("a)", :black,:24))
+	###############
+	plt1c = plot(xlabel="",ylabel="",border=:none,xlims=xlims,ylims=ylims,legend=false)
+	plot!(plt1c,[-1,1],liney,lc=1)
+	plot!(plt1c,[H[1],P[1]],[H[2],P[2]],color=:black,lw=3,arrow=true,markers=true)
+	plot!(plt1c,[H[1],H2[1]],[H[2],H2[2]],color=:brown,lw=3,arrow=true)
+	plot!(plt1c,[H[1],Hu[1]],[H[2],Hu[2]],color=:red,lw=3,arrow=true)
+	plot!(plt1c,[H[1],P[1]],[H[2],P[2]],color=:black,lw=3,arrow=true,markers=true,ms=6)
+	scatter!(plt1c,[H2[1]],[H2[2]],color=:blue,ms=6)
+	annotate!(plt1c,H[1],H[2]+0.15,text(L"\mathbf{\bar{H}}", :black, :18))
+	annotate!(plt1c,H2[1]+0.15,H2[2],text(L"\mathbf{\bar{H'}}", :blue, :18))
+	annotate!(plt1c,P[1],P[2]+0.1,text(L"\mathbf{\bar{P}}", :black, :18))
+	annotate!(plt1c,0.5*(H[1]+P[1]),0.5*(H[2]+P[2])+0.2,text(L"\mathbf{\bar{D}}", :black, :18))
+	annotate!(plt1c,0.5*(H[1]+Hu[1]),0.5*(H[2]+Hu[2])-0.1,text(L"\mathbf{\hat{u}}", :red, :18))
+	annotate!(plt1c,0.3*(H[1]+H2[1]),0.3*(H[2]+H2[2])-0.1,text(L"\mathbf{d\bar{H}}", :brown, :18))
+	annotate!(plt1c,-1, 1, text("b)", :black,:24))
+	##############
+	plt1d = plot(xlabel="",ylabel="",border=:none,xlims=xlims,ylims=ylims,legend=false)
+	plot!(plt1d,[-1,1],liney,lc=1)
+	#plot!(plt1d,[H[1],P[1]],[H[2],P[2]],color=:black,lw=3,arrow=true,markers=true)
+	plot!(plt1d,[H[1],H2[1]],[H[2],H2[2]],color=:brown,lw=3,arrow=true)
+	plot!(plt1d,[H[1],Hu[1]],[H[2],Hu[2]],color=:red,lw=3,arrow=true)
+	plot!(plt1d,[P[1],H2[1]],[P[2],H2[2]],color=:blue,lw=3,arrow=true)
+	plot!(plt1d,[H[1],P[1]],[H[2],P[2]],color=:black,lw=3,arrow=true,markers=true,ms=6)
+	scatter!(plt1d,[H2[1]],[H2[2]],color=:blue,ms=6)
+	annotate!(plt1d,H[1],H[2]+0.15,text(L"\mathbf{\bar{H}}", :black, :18))
+	annotate!(plt1d,H2[1]+0.15,H2[2],text(L"\mathbf{\bar{H'}}", :blue, :18))
+	annotate!(plt1d,P[1],P[2]+0.1,text(L"\mathbf{\bar{P}}", :black, :18))
+	annotate!(plt1d,0.5*(H2[1]+P[1])+0.1,0.5*(H2[2]+P[2]),text(L"\mathbf{\bar{F}}", :blue, :18))
+	annotate!(plt1d,0.5*(H[1]+Hu[1]),0.5*(H[2]+Hu[2])-0.1,text(L"\mathbf{\hat{u}}", :red, :18))
+	annotate!(plt1d,0.3*(H[1]+H2[1]),0.3*(H[2]+H2[2])-0.1,text(L"\mathbf{d\bar{H}}", :brown, :18))
+	annotate!(plt1d,-1, 1, text("c)", :black,:24))
+	fig1 = plot(plt1b,plt1c,plt1d,layout=(1,3),size=(1500,500))
+	savefig(fig1, "fig1.svg")
+	fig1
+end	
+
+# ╔═╡ 84ff87f5-de12-4100-9548-3231a4a1d531
+begin
+	zlims = (-1,1)
+	slopex = 0.2
+	slopey = 0.2
+	z(x,y) = x*slopex+y*slopey-0.1x^2-0.15*y^2
+	Hx = -0.5
+	Hy = -0.4
+	H3 = [Hx,Hy,z(Hx,Hy)]
+	P3 = [0.3,0.2,0.95]
+	D3 = P3-H3
+	Tx = [1, 0, slopex]
+	Ty = [0, 1, slopey]
+	N3 = cross(Tx,Ty)
+	N3 /= sqrt(sum(N3.^2))
+	Q = dot(N3,D3)*N3
+	HQ = H3 + Q
+	dH3  = D3 - Q
+	H4 = H3+dH3
+	Hn = H3 + N3
+end
+
+# ╔═╡ 02697004-7f48-4113-b0cb-37b1d67aba52
+md"""
+azimut $(@bind az Slider(-180:10:180,default=10;show_value=true))
+elev $(@bind el Slider(-90:10:90,default=10;show_value=true))
+"""
+
+# ╔═╡ 3fe21494-81f5-41de-8c6e-eaee73b5f41d
+function arrow3d!(plt, x, y, z,  u, v, w; as=0.1, lc=:black, lw=3.0, scale=1.0)
+    (as < 0) && (nv0 = -maximum(norm.(eachrow([u v w]))))
+    for (x,y,z, u1,v1,w1) in zip(x,y,z, u,v,w)
+		u,v,w = [u1,v1,w1]/scale
+        nv = sqrt(u^2 + v^2 + w^2) # modulus of vector
+        v1, v2 = -[u,v,w]/nv, nullspace(adjoint([u,v,w]))[:,1]
+        v4 = (3*v1 + v2)/3.1623  # sqrt(10) to get unit vector
+        v5 = v4 - 2*(v4'*v2)*v2
+        (as < 0) && (nv = nv0) 
+        v4, v5 = -as*nv*v4, -as*nv*v5
+        l1 = plot!(plt,[x,x+u],[y,y+v],[z,z+w],lw=lw, color=lc)
+        l2 = plot!(plt,[x+u,x+u-v5[1]], [y+v,y+v-v5[2]], [z+w,z+w-v5[3]],lw=lw, color=lc)
+        l3 = plot!(plt,[x+u,x+u-v4[1]], [y+v,y+v-v4[2]], [z+w,z+w-v4[3]],lw=lw, color=lc)
+    end
+end
+
+# ╔═╡ c786d803-f9b0-452a-a123-a1f15027d0ed
+begin
+	x1=-1:0.05:1
+	y1=-1:0.05:1
+	plt2 = plot(xlabel="",ylabel="",zlabel="",xlims=xlims,ylims=ylims,legend=false,size=(800,600))
+	#plot!(plt2,x1,y1,z,st=:wireframe, c=:viridis, camera=(az, el),display_option=Plots.GR.OPTION_SHADED_MESH)
+	plot!(plt2,x1,y1,z,st=:surface, c=:viridis, camera=(az, el),showaxis=false,display_option=Plots.GR.OPTION_SHADED_MESH)
+	#grid!(plt2,x_tick=0.5, y_tick=0.5, z_tick=0.5)
+	arrow3d!(plt2, [H3[1]], [H3[2]], [H3[3]],  [Tx[1]], [Tx[2]], [Tx[3]];lc=:red)
+	arrow3d!(plt2, [H3[1]], [H3[2]], [H3[3]],  [Ty[1]], [Ty[2]], [Ty[3]];lc=:blue)
+	arrow3d!(plt2, [H3[1]], [H3[2]], [H3[3]],  [Q[1]], [Q[2]], [Q[3]];lc=:brown)
+	arrow3d!(plt2, [H3[1]], [H3[2]], [H3[3]],  [dH3[1]], [dH3[2]], [dH3[3]];lc=:purple)
+	arrow3d!(plt2, [H3[1]], [H3[2]], [H3[3]],  [N3[1]], [N3[2]], [N3[3]];lc=:green,scale=1.5)
+	arrow3d!(plt2, [H3[1]], [H3[2]], [H3[3]],  [D3[1]], [D3[2]], [D3[3]])
+	plot!(plt2,[P3[1],HQ[1]],[P3[2],HQ[2]],[P3[3],HQ[3]],color=:brown,ls=:dash)
+	plot!(plt2,[P3[1],H4[1]],[P3[2],H4[2]],[P3[3],H4[3]],color=:brown,ls=:dash)
+	plot!(plt2,[H3[1],P3[1],H4[1]],[H3[2],P3[2],H4[2]],[H3[3],P3[3],H4[3]],color=:black,lw=0,markers=true,ms=6)
+	annotate!(plt2,H3[1],H3[2]-0.2,H3[3],text(L"\mathbf{\bar{H}}", :black, :18))
+	annotate!(plt2,P3[1],P3[2]+0.2,P3[3],text(L"\mathbf{\bar{P}}", :black, :18))
+	annotate!(plt2,0.5*(H3[1]+P3[1]),0.5*(H3[2]+P3[2])-0.1,0.5*(H3[3]+P3[3])+0.1,text(L"\mathbf{\bar{D}}", :black, :18))
+	annotate!(plt2,0.5*(1.5*H3[1]+Tx[1]),0.5*(1.5*H3[2]+Tx[2])-0.2,0.5*(1.5*H3[3]+Tx[3])-0.1,text(L"\mathbf{\bar{T}_u}", :red, :18))
+	annotate!(plt2,0.5*(1.5*H3[1]+Ty[1]),0.5*(1.5*H3[2]+Ty[2])+0.3,0.5*(1.5*H3[3]+Ty[3])+0.2,text(L"\mathbf{\bar{T}_v}", :blue, :18))
+	annotate!(plt2,0.5*(2*H3[1]+N3[1]),0.5*(2.0*H3[2]+N3[2])-0.1,0.5*(2.0*H3[3]+N3[3])-0.1,text(L"\mathbf{\hat{n}}", :green, :18))
+	annotate!(plt2,0.5*(2*H3[1]+Q[1]),0.5*(2.0*H3[2]+Q[2])-0.2,0.5*(2.0*H3[3]+Q[3])+0.2,text(L"\mathbf{\bar{Q}}", :brown, :18))
+	annotate!(plt2,0.5*(H3[1]+H4[1]),0.5*(H3[2]+H4[2]),0.5*(H3[3]+H4[3])+0.1,text(L"\mathbf{d\bar{H}}", :brown, :18))
+	savefig(plt2, "fig2.svg")
+	plt2
+end
+
+# ╔═╡ 81a849da-3b79-4a90-82d9-92771b80e019
+html"""
+<style>
+main {
+    max-width: 1500px;
+}
+input[type*="range"] {
+	width: 35%;
+}
+</style>
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
-Latexify = "~0.16.5"
+LaTeXStrings = "~1.4.0"
 Plots = "~1.40.9"
 PlutoUI = "~0.7.60"
 """
@@ -29,7 +195,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.7"
 manifest_format = "2.0"
-project_hash = "b5967d3a7775d86e91522575bf4a30180f95ea4b"
+project_hash = "fad9e8caf0e8cf9dc95620556eb610179bf07a35"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1159,5 +1325,11 @@ version = "1.4.1+1"
 # ╔═╡ Cell order:
 # ╠═7f830ff0-b7a4-11ef-12d3-af29c0deae66
 # ╠═ba18a25b-9440-477e-b25c-cf1a7714a6d5
+# ╠═05360d6e-4a6e-494a-ad39-64d4293b7dcd
+# ╠═84ff87f5-de12-4100-9548-3231a4a1d531
+# ╟─02697004-7f48-4113-b0cb-37b1d67aba52
+# ╠═c786d803-f9b0-452a-a123-a1f15027d0ed
+# ╠═3fe21494-81f5-41de-8c6e-eaee73b5f41d
+# ╠═81a849da-3b79-4a90-82d9-92771b80e019
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
