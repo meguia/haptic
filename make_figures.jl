@@ -19,6 +19,9 @@ end
 # ╔═╡ 7f830ff0-b7a4-11ef-12d3-af29c0deae66
 using Plots, PlutoUI, LaTeXStrings, LinearAlgebra
 
+# ╔═╡ 2138d023-3e3d-464a-ba05-b289be76573f
+
+
 # ╔═╡ ba18a25b-9440-477e-b25c-cf1a7714a6d5
 begin
 	xlims = (-1,1)
@@ -1324,6 +1327,7 @@ version = "1.4.1+1"
 
 # ╔═╡ Cell order:
 # ╠═7f830ff0-b7a4-11ef-12d3-af29c0deae66
+# ╠═2138d023-3e3d-464a-ba05-b289be76573f
 # ╠═ba18a25b-9440-477e-b25c-cf1a7714a6d5
 # ╠═05360d6e-4a6e-494a-ad39-64d4293b7dcd
 # ╠═84ff87f5-de12-4100-9548-3231a4a1d531

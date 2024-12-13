@@ -38,12 +38,18 @@ md"""
 # Parametric Curves
 """
 
+# ╔═╡ 5d54870b-3be8-47a0-aff5-116c16d7fdaa
+md"""
+## Lifted Lissajous Curves
+"""
+
 # ╔═╡ c7131a8b-8c36-4afc-baa0-7d4bc1fad7d8
 md"""
 x $(@bind fx Select([sin, cos])) $(@bind nx Select(collect(1:4))) $(string(fx)) ( $(nx) * t)\
-y $(@bind fy Select([sin, cos])) $(@bind ny Select(collect(1:4))) $(string(fy)) ( $(ny) * t)\
-z $(@bind fz Select([sin, cos])) $(@bind nz Select(collect(1:4))) $(string(fz)) ( $(nz) * t)\
+y $(@bind fy Select([sin, cos])) $(@bind ny Select(collect(2:5))) $(string(fy)) ( $(ny) * t)\
+z $(@bind fz Select([cos, sin])) $(@bind nz Select(collect(1:4))) $(string(fz)) ( $(nz) * t)\
 N $(@bind N Slider(10:10:100,default=10;show_value=true))
+scale $(@bind scale Slider(0.2:0.1:5.0,default=3.0;show_value=true))
 """
 
 # ╔═╡ aea9c17c-7747-496e-a5d5-f513b1294f05
@@ -56,11 +62,16 @@ f = [
 
 # ╔═╡ f7c9f82c-e26a-43d7-968c-528d9d1af68f
 begin
-	go1 = parametric_curve(f,0,2*pi,300,0:2*pi/N:2*pi;scale=5.0)
+	go1 = parametric_curve(f,0,2*pi,300,0:2*pi/N:2*pi;scale=scale)
 	layout = Layout(title=join(string.(f)," , "), autosize=false, width=1200, height=800)
 	p1 = Plot(go1,layout)
 	p1
 end	
+
+# ╔═╡ b1fffa1c-8a50-4541-870f-92ecbc2423b6
+md"""
+## Knots around the Torus
+"""
 
 # ╔═╡ fa212423-eed7-49fd-a627-abb955eed195
 md"""
@@ -78,8 +89,21 @@ s = [
 begin
 	go2 = parametric_surface(s,0,2*pi,0,2*pi,30,30,[[pi/3,pi/3],[0,pi/3]]; scale=2.0,lw=8.0)
 	layout2 = Layout(title=join(string.(s)," , "), autosize=false, width=1200, height=800)
-	p2 = Plot(go2,layout2)
-	p2
+	Plot(go2,layout2)
+end	
+
+# ╔═╡ 4bbd6196-4701-4071-aa46-004adf498c0b
+s2 = [
+	(3+u/2*cos(v/2))*cos(v),
+	(3+u/2*cos(v/2))*sin(v),
+	u/2*sin(v/2)
+]
+
+# ╔═╡ ad93942f-98c6-4dc5-8303-f3a88f210f9f
+begin
+	go3 = parametric_surface(s2,-1,1,0,2*pi,30,30,[[0,2*pi]]; scale=2.0,lw=8.0)
+	layout3 = Layout(title=join(string.(s2)," , "), autosize=false, width=1200, height=800)
+	Plot(go3,layout3)
 end	
 
 # ╔═╡ 6e39c24f-a52b-432f-95be-b3dc47ef8cb1
@@ -89,7 +113,7 @@ main {
     max-width: 1200px;
 }
 input[type*="range"] {
-	width: 95%;
+	width: 35%;
 }
 </style>
 """
@@ -1292,12 +1316,16 @@ version = "17.4.0+2"
 # ╠═7c62454e-efb7-4116-b37f-b74b4576bfa6
 # ╠═eaae8960-8d27-452f-b9f5-c123fd0993ec
 # ╟─0e490cd8-3b08-45bb-98e5-10eac83814f3
-# ╠═f7c9f82c-e26a-43d7-968c-528d9d1af68f
-# ╠═c7131a8b-8c36-4afc-baa0-7d4bc1fad7d8
+# ╟─5d54870b-3be8-47a0-aff5-116c16d7fdaa
+# ╟─f7c9f82c-e26a-43d7-968c-528d9d1af68f
+# ╟─c7131a8b-8c36-4afc-baa0-7d4bc1fad7d8
 # ╟─aea9c17c-7747-496e-a5d5-f513b1294f05
+# ╟─b1fffa1c-8a50-4541-870f-92ecbc2423b6
 # ╟─fa212423-eed7-49fd-a627-abb955eed195
-# ╠═af741731-1d0e-414d-a803-39823d5f7006
+# ╟─af741731-1d0e-414d-a803-39823d5f7006
 # ╠═2911049c-c9a1-49f3-ac39-dd97dd10151d
+# ╟─4bbd6196-4701-4071-aa46-004adf498c0b
+# ╠═ad93942f-98c6-4dc5-8303-f3a88f210f9f
 # ╠═6e39c24f-a52b-432f-95be-b3dc47ef8cb1
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
